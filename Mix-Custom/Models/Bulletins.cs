@@ -62,20 +62,22 @@ namespace MixCustom.Models
             return R;
         }
         
-        public void sendToNextMix(Bulletin[] bulletins)
+        public bool sendToNextMix(Bulletin[] bulletins)
         {
             string serializedBulletins = JsonConvert.SerializeObject(bulletins);
-            requestToMix(serializedBulletins, "shuffle-bulletins");
+            if (requestToMix(serializedBulletins, config.Next_MixServer_Url, "api/ppg/handle-bulletins").IsSuccessStatusCode)
+                return true;
+            return false;
         }
         
-        public void requestToMix(string serializedObjectData, string actioUri)
+        private HttpResponseMessage requestToMix(string serializedObjectData, string baseUrl, string actioUri)
         {
             var client = new HttpClient();
             var content = new StringContent(serializedObjectData, Encoding.UTF8, "application/json");
-            client.BaseAddress = new Uri(config.Next_MixServer_Url);
+            client.BaseAddress = new Uri(baseUrl);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            client.PostAsync(actioUri, content);
+            return client.PostAsync(actioUri, content).Result;
         }
     }
 }

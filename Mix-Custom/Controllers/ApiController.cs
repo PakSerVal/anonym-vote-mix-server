@@ -15,17 +15,18 @@ namespace MixCustom.Controllers
         }
 
         [HttpPost("handle-bulletins")]
-        public IActionResult ShuffleBulletins([FromBody] Bulletin[] bulletins)
+        public IActionResult HandleBulletins([FromBody]  Bulletin[] bulletins)
         {
             if (bulletins.Length != 0 )
             {
                 Bulletins bulletinsModel = new Bulletins(config);
                 Bulletin[] shuffledBulletins =  bulletinsModel.Shuffle<Bulletin>(bulletins);
-                bulletinsModel.sendToNextMix(shuffledBulletins);
-                return Ok();
+                if (bulletinsModel.sendToNextMix(shuffledBulletins))
+                    return Ok();
             }
             return BadRequest();
         }
 
+        
     }
 }
